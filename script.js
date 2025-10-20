@@ -75,8 +75,22 @@ document.querySelector('.scroll-btn.right')?.addEventListener('click', () => {
 // ===== ADICIONAR PRODUTOS =====
 document.querySelectorAll('.btn-add').forEach(btn => {
   btn.addEventListener('click', e => {
-    const name = e.target.dataset.name || 'Produto';
-    const price = parseFloat(e.target.dataset.price) || 0;
+    const card = e.target.closest('.card');
+    const baseName = card?.dataset.name?.trim() || 'Produto';
+    const variation = e.target.dataset.name?.trim() || ''; // ex: “Meia” ou “Batata Bacon Queijo Catupiry - Meia”
+    const price = parseFloat(e.target.dataset.price) || parseFloat(card?.dataset.price) || 0;
+
+    // ✅ Lógica inteligente: evita duplicação se o botão já contém o nome do card
+    let name;
+    if (!variation) {
+      name = baseName;
+    } else if (variation.toLowerCase().includes(baseName.toLowerCase())) {
+      // Se o botão já tem o nome completo (ex: "Batata Bacon Queijo Catupiry - Meia")
+      name = variation;
+    } else {
+      // Caso contrário, adiciona o nome do card e a variação entre parênteses
+      name = `${baseName} (${variation})`;
+    }
 
     cart.push({ name, price });
     updateCart();
@@ -126,7 +140,7 @@ checkoutBtn?.addEventListener('click', () => {
   if (pickup === 'delivery') message += `Endereço: ${endereco || '-'}%0A`;
   if (payment === 'dinheiro' && troco) message += `Precisa de troco para: R$ ${troco}%0A`;
 
-  window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+  window.open(`https://wa.me/5517992800946?text=${message}`, '_blank');
 });
 
 // ===== MENU FIXO E SCROLL SUAVE =====
