@@ -13,6 +13,7 @@ const trocoInput = document.getElementById('troco');
 
 // ===== CARRINHO =====
 let cart = [];
+let deliveryFeeAdded = false;
 
 cartIcon?.addEventListener('click', () => {
   cartPanel.classList.toggle('open');
@@ -122,6 +123,18 @@ function toggleFields() {
 
   if (deliveryAddress) deliveryAddress.style.display = pickup === 'delivery' ? 'block' : 'none';
   if (trocoContainer) trocoContainer.style.display = payment === 'dinheiro' ? 'block' : 'none';
+
+  const deliveryFeeIndex = cart.findIndex(item => item.name === 'Taxa de entrega');
+
+  if (pickup === 'delivery' && deliveryFeeIndex === -1) {
+    cart.push({ name: 'Taxa de entrega', price: 4.00 });
+    deliveryFeeAdded = true;
+    updateCart();
+  } else if (pickup !== 'delivery' && deliveryFeeIndex !== -1) {
+    cart.splice(deliveryFeeIndex, 1);
+    deliveryFeeAdded = false;
+    updateCart();
+  }
 }
 
 // ===== FINALIZAR PEDIDO VIA WHATSAPP =====
