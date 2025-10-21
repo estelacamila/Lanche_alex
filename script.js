@@ -75,22 +75,30 @@ document.querySelector('.scroll-btn.right')?.addEventListener('click', () => {
 // ===== ADICIONAR PRODUTOS =====
 document.querySelectorAll('.btn-add').forEach(btn => {
   btn.addEventListener('click', e => {
-    const card = e.target.closest('.card');
-    const baseName = card?.dataset.name?.trim() || 'Produto';
-    const variation = e.target.dataset.name?.trim() || ''; // ex: “Meia” ou “Batata Bacon Queijo Catupiry - Meia”
-    const price = parseFloat(e.target.dataset.price) || parseFloat(card?.dataset.price) || 0;
+    e.stopPropagation(); // impede clique em elementos filhos dentro do botão
+    const card = e.currentTarget.closest('.card');
+    if (!card) return;
 
-    // ✅ Lógica inteligente: evita duplicação se o botão já contém o nome do card
+    const baseName = card.dataset.name?.trim() || 'Produto';
+    const variation = e.currentTarget.dataset.name?.trim() || '';
+    const price = parseFloat(e.currentTarget.dataset.price || card.dataset.price || 0);
+
+    // 🚫 Ignora produtos sem preço (elimina "Produto R$ 0,00")
+    if (!price || price <= 0) return;
+
+    // ✅ Monta nome corretamente
     let name;
     if (!variation) {
       name = baseName;
     } else if (variation.toLowerCase().includes(baseName.toLowerCase())) {
-      // Se o botão já tem o nome completo (ex: "Batata Bacon Queijo Catupiry - Meia")
       name = variation;
     } else {
-      // Caso contrário, adiciona o nome do card e a variação entre parênteses
       name = `${baseName} (${variation})`;
     }
+
+    // 🚫 Evita duplicação de cliques rápidos no mesmo item
+    const lastItem = cart[cart.length - 1];
+    if (lastItem && lastItem.name === name && lastItem.price === price) return;
 
     cart.push({ name, price });
     updateCart();
@@ -132,6 +140,7 @@ checkoutBtn?.addEventListener('click', () => {
   cart.forEach(item => {
     message += `- ${item.name} - R$ ${parseFloat(item.price).toFixed(2)}%0A`;
   });
+
   const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
   message += `Total: R$ ${total.toFixed(2)}%0A`;
   message += `Pagamento: ${payment || '-'}%0A`;
