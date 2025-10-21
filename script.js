@@ -58,6 +58,10 @@ function updateCart() {
   document.querySelectorAll('.btn-remove').forEach(btn => {
     btn.addEventListener('click', e => {
       const i = e.target.getAttribute('data-index');
+      if (cart[i].name === 'Taxa de entrega') {
+        document.querySelector('input[name="pickup"][value="balcao"]').checked = true;
+        deliveryFeeAdded = false;
+      }
       cart.splice(i, 1);
       updateCart();
     });
